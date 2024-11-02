@@ -38,9 +38,9 @@ runs:
       shell: bash
       run: |
         pnpm up --latest
-        git diff > diff.txt
-        echo "diff=$(cat diff.txt)" >> $GITHUB_ENV
-        rm -f diff.txt
+        echo "diff<<EOF" >> $GITHUB_ENV
+        git diff >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
     - name: Cache NPM dependencies
       uses: actions/cache@v4.1.2
       with:
