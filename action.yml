@@ -33,10 +33,7 @@ runs:
           ${{ runner.os }}-pnpm-node_modules-
     - name: Install pnpm and dependencies
       shell: bash
-      run: |
-        corepack enable
-        corepack prepare pnpm@latest --activate
-        pnpm install
+      run: pnpm install
     - name: Update Dependencies
       shell: bash
       run: |
