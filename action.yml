@@ -18,6 +18,7 @@ runs:
       run: |
         curl -fsSL https://nodejs.org/dist/v22.11.0/node-v22.11.0-linux-x64.tar.xz -o node-v22.11.0-linux-x64.tar.xz
         sudo tar -xJf node-v22.11.0-linux-x64.tar.xz -C /usr/local
+        rm -f node-v22.11.0-linux-x64.tar.xz
         echo "/usr/local/node-v22.11.0-linux-x64/bin" >> $GITHUB_PATH
     - name: Corepack
       shell: bash
