@@ -11,6 +11,7 @@ runs:
     - name: Checkout code
       uses: actions/checkout@v4.2.2
       with:
+        token: ${{ inputs.gh_token }}
         fetch-depth: 0
         ref: main
     - name: Node
