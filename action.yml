@@ -24,21 +24,23 @@ runs:
         cat /tmp/diff.txt >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
         rm /tmp/diff.txt
+    - name: Upload Diff Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: dependency-diff
+        path: /tmp/diff.txt
     - name: Create Pull Request
       id: create_pr
       uses: peter-evans/create-pull-request@v7.0.6
       with:
         token: ${{ inputs.gh_token }}
-        commit-message: |
-          chore(deps): upgrade dependencies
         branch: github-actions/upgrade-main
         title: "chore(deps): upgrade dependencies"
         labels: auto-merge
-        body: |
-          Upgrades project dependencies. The following changes were made:
-          ```diff
-          ${{ env.diff }}
-          ```
         author: github-actions <github-actions@github.com>
         committer: github-actions <github-actions@github.com>
         signoff: true
+        commit-message: |
+          chore(deps): upgrade dependencies
+        body: |
+          Upgrades project dependencies. Please refer to the uploaded artifact "dependency-diff" for details.
