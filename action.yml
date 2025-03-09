@@ -29,6 +29,9 @@ runs:
       shell: bash
       run: |
         rm -f /tmp/diff.txt
+    - name: Restore git credentials
+      shell: bash
+      run: git remote set-url origin https://x-access-token:${{ inputs.gh_token }}@github.com/${{ github.repository }}
     - name: Create Pull Request
       id: create_pr
       uses: peter-evans/create-pull-request@v7.0.6
