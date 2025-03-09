@@ -25,7 +25,7 @@ runs:
         echo "EOF" >> $GITHUB_ENV
         rm /tmp/diff.txt
     - name: Upload Diff Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4.6.1
       with:
         name: dependency-diff
         path: /tmp/diff.txt
