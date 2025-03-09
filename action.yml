@@ -20,15 +20,15 @@ runs:
       run: |
         pnpm up --latest
         git diff --stat > /tmp/diff.txt
-        echo "diff<<EOF" >> $GITHUB_ENV
-        cat /tmp/diff.txt >> $GITHUB_ENV
-        echo "EOF" >> $GITHUB_ENV
-        rm /tmp/diff.txt
     - name: Upload Diff Artifact
       uses: actions/upload-artifact@v4.6.1
       with:
         name: dependency-diff
         path: /tmp/diff.txt
+    - name: Cleanup diff file
+      shell: bash
+      run: |
+        rm -f /tmp/diff.txt
     - name: Create Pull Request
       id: create_pr
       uses: peter-evans/create-pull-request@v7.0.6
