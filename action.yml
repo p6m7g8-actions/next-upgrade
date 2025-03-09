@@ -13,6 +13,10 @@ runs:
       with:
         fetch-depth: 0
         ref: main
+    - name: Set remote URL for HTTPS authentication
+      shell: bash
+      run: |
+        git remote set-url origin https://x-access-token:${{ inputs.gh_token }}@github.com/pgollucci/gollucci.com/
     - name: Node
       uses: p6m7g8-actions/node-setup@main
     - name: Update Dependencies
@@ -29,9 +33,6 @@ runs:
       shell: bash
       run: |
         rm -f /tmp/diff.txt
-    - name: Restore git credentials
-      shell: bash
-      run: git remote set-url origin https://x-access-token:${{ inputs.gh_token }}@github.com/${{ github.repository }}
     - name: Create Pull Request
       id: create_pr
       uses: peter-evans/create-pull-request@v7.0.6
