@@ -18,8 +18,8 @@ runs:
     - name: Update Dependencies
       shell: bash
       run: |
-        pnpm up --latest --ignore-workspace-root-check --filter=!tailwindcss
-        npx update-browserslist-db@latest
+        pnpm up --latest
+        pnpm add -D tailwindcss@^3.4.18
     - name: Generate Delta
       shell: bash
       run: |
