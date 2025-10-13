@@ -9,7 +9,7 @@ runs:
   using: "composite"
   steps:
     - name: Checkout code
-      uses: actions/checkout@v4.2.2
+      uses: actions/checkout@v5.0.0
       with:
         token: ${{ inputs.gh_token }}
         fetch-depth: 0
@@ -19,7 +19,7 @@ runs:
     - name: Update Dependencies
       shell: bash
       run: |
-        pnpm up --latest
+        pnpm up --latest --ignore-workspace-root-check --filter=!tailwindcss && npx update-browserslist-db@latest
         git diff --stat > /tmp/diff.txt
     - name: Create Pull Request
       id: create_pr
