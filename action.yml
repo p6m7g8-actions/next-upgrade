@@ -9,7 +9,7 @@ runs:
   using: "composite"
   steps:
     - name: Checkout code
-      uses: actions/checkout@v4.2.2
+      uses: actions/checkout@v5.0.0
       with:
         fetch-depth: 0
         ref: main
@@ -18,13 +18,17 @@ runs:
     - name: Update Dependencies
       shell: bash
       run: |
-        pnpm up --latest
+	pnpm up --latest --ignore-workspace-root-check --filter=!tailwindcss
+	npx update-browserslist-db@latest
+    - name: Generate Delta
+      shell: bash
+      run: |
         echo "diff<<EOF" >> $GITHUB_ENV
         git diff >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
     - name: Create Pull Request
       id: create_pr
-      uses: peter-evans/create-pull-request@v7.0.5
+      uses: peter-evans/create-pull-request@v7.0.8
       with:
         token: ${{ inputs.gh_token }}
         commit-message: |
