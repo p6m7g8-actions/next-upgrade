@@ -31,7 +31,7 @@ runs:
     - name: Configure authenticated origin
       shell: bash
       run: |
-        git remote set-url origin "https://x-access-token:${{ inputs.gh_token }}@github.com/${{ github.repository }}.git"
+        git remote set-url origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
     - name: Create Pull Request
       id: create_pr
       uses: peter-evans/create-pull-request@v7.0.8
