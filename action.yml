@@ -26,7 +26,6 @@ runs:
       shell: bash
       run: |
         pnpm up --latest --prod
-        pnpm add -D tailwindcss@^3.4.18
     - name: Generate Delta
       shell: bash
       run: |
