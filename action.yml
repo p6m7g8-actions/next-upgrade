@@ -35,7 +35,7 @@ runs:
       id: create_pr
       uses: peter-evans/create-pull-request@v7.0.8
       with:
-        token: ${{ inputs.gh_token }}
+        token: ${{ inputs.git_token }}
         branch-token: ${{ inputs.git_token }}
         commit-message: |
           chore(deps): upgrade dependencies
