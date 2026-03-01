@@ -9,8 +9,9 @@ runs:
   using: "composite"
   steps:
     - name: Checkout code
-      uses: p6m7g8-actions/checkout@main
+      uses: actions/checkout@v4
       with:
+        token: ${{ inputs.gh_token }}
         fetch-depth: 0
         ref: main
     - name: Node
@@ -31,6 +32,7 @@ runs:
         token: ${{ inputs.gh_token }}
         commit-message: |
           chore(deps): upgrade dependencies
+        base: main
         branch: github-actions/upgrade-main
         title: "chore(deps): upgrade dependencies"
         labels: auto-merge
