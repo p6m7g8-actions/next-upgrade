@@ -12,7 +12,11 @@ runs:
       uses: p6m7g8-actions/checkout@main
       with:
         fetch-depth: 0
-        ref: main
+    - name: Force main branch
+      shell: bash
+      run: |
+        git fetch origin main
+        git checkout -B main origin/main
     - name: Node
       uses: p6m7g8-actions/node-setup@main
     - name: Update Dependencies
@@ -24,6 +28,10 @@ runs:
       shell: bash
       run: |
         git diff
+    - name: Configure authenticated origin
+      shell: bash
+      run: |
+        git remote set-url origin "https://x-access-token:${{ inputs.gh_token }}@github.com/${{ github.repository }}.git"
     - name: Create Pull Request
       id: create_pr
       uses: peter-evans/create-pull-request@v7.0.8
@@ -31,6 +39,7 @@ runs:
         token: ${{ inputs.gh_token }}
         commit-message: |
           chore(deps): upgrade dependencies
+        base: main
         branch: github-actions/upgrade-main
         title: "chore(deps): upgrade dependencies"
         labels: auto-merge
