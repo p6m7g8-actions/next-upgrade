@@ -9,11 +9,14 @@ runs:
   using: "composite"
   steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: p6m7g8-actions/checkout@main
       with:
-        token: ${{ inputs.gh_token }}
         fetch-depth: 0
-        ref: main
+    - name: Force main branch
+      shell: bash
+      run: |
+        git fetch origin main
+        git checkout -B main origin/main
     - name: Node
       uses: p6m7g8-actions/node-setup@main
     - name: Update Dependencies
@@ -25,6 +28,10 @@ runs:
       shell: bash
       run: |
         git diff
+    - name: Configure authenticated origin
+      shell: bash
+      run: |
+        git remote set-url origin "https://x-access-token:${{ inputs.gh_token }}@github.com/${{ github.repository }}.git"
     - name: Create Pull Request
       id: create_pr
       uses: peter-evans/create-pull-request@v7.0.8
