@@ -5,6 +5,9 @@ inputs:
   gh_token:
     description: "GitHub Token"
     required: true
+  git_token:
+    description: "Git token for branch operations"
+    required: true
 runs:
   using: "composite"
   steps:
@@ -28,15 +31,12 @@ runs:
       shell: bash
       run: |
         git diff
-    - name: Configure authenticated origin
-      shell: bash
-      run: |
-        git remote set-url origin "https://${{ github.repository_owner }}:${{ inputs.gh_token }}@github.com/${{ github.repository }}.git"
     - name: Create Pull Request
       id: create_pr
       uses: peter-evans/create-pull-request@v7.0.8
       with:
         token: ${{ inputs.gh_token }}
+        branch-token: ${{ inputs.git_token }}
         commit-message: |
           chore(deps): upgrade dependencies
         base: main
