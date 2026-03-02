@@ -3,11 +3,13 @@ description: "P6 GHA: Upgrade Dependencies for NextJS Static Site"
 author: "Philip M. Gollucci"
 inputs:
   gh_token:
-    description: "GitHub Token"
-    required: true
-  git_token:
-    description: "Git token for branch operations"
+    description: "Fallback GitHub token (e.g., P6_A_GH_TOKEN)"
     required: false
+    default: ""
+  git_token:
+    description: "Secondary fallback token for branch operations"
+    required: false
+    default: ""
 runs:
   using: "composite"
   steps:
@@ -34,7 +36,7 @@ runs:
       id: token
       uses: p6m7g8-actions/gh-token-normalize@main
       with:
-        preferred-token: ${{ inputs.git_token }}
+        preferred-token: ${{ github.token }}
         fallback-token: ${{ inputs.gh_token }}
         default-token: ${{ github.token }}
     - name: Configure authenticated git remote
@@ -52,7 +54,11 @@ runs:
         base: main
         branch: github-actions/upgrade-main
         title: "chore(deps): upgrade dependencies"
-        labels: auto-merge
+        labels: |
+          auto-approve
+          auto-merge
+        reviewers: |
+          p6m7g8-automation
         body: |
           Upgrades project dependencies.
         author: github-actions <github-actions@github.com>
