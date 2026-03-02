@@ -3,11 +3,10 @@ description: "P6 GHA: Upgrade Dependencies for NextJS Static Site"
 author: "Philip M. Gollucci"
 inputs:
   gh_token:
-    description: "Fallback GitHub token (e.g., P6_A_GH_TOKEN)"
-    required: false
-    default: ""
+    description: "GitHub token used for PR creation (P6_A_GH_TOKEN)"
+    required: true
   git_token:
-    description: "Secondary fallback token for branch operations"
+    description: "Optional extra fallback token for branch operations"
     required: false
     default: ""
 runs:
@@ -36,8 +35,8 @@ runs:
       id: token
       uses: p6m7g8-actions/gh-token-normalize@main
       with:
-        preferred-token: ${{ github.token }}
-        fallback-token: ${{ inputs.gh_token }}
+        preferred-token: ${{ inputs.gh_token }}
+        fallback-token: ${{ inputs.git_token }}
         default-token: ${{ github.token }}
     - name: Configure authenticated git remote
       shell: bash
