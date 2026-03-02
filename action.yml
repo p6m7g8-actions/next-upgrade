@@ -7,7 +7,7 @@ inputs:
     required: true
   git_token:
     description: "Git token for branch operations"
-    required: true
+    required: false
 runs:
   using: "composite"
   steps:
@@ -30,12 +30,44 @@ runs:
       shell: bash
       run: |
         git diff
+    - name: Normalize GitHub token
+      id: token
+      shell: bash
+      run: |
+        sanitize() {
+          local t="$1"
+          t="${t#https://x-access-token:}"
+          t="${t#x-access-token:}"
+          t="${t%@github.com*}"
+          echo "$t"
+        }
+
+        preferred="$(sanitize "${{ inputs.git_token }}")"
+        fallback="$(sanitize "${{ inputs.gh_token }}")"
+        default_token="$(sanitize "${{ github.token }}")"
+        auth_ok() {
+          local t="$1"
+          [[ -n "$t" ]] || return 1
+          curl -fsS -H "Authorization: Bearer ${t}" https://api.github.com/user >/dev/null
+        }
+
+        if auth_ok "${preferred}"; then
+          echo "value=${preferred}" >> "$GITHUB_OUTPUT"
+        elif auth_ok "${fallback}"; then
+          echo "value=${fallback}" >> "$GITHUB_OUTPUT"
+        else
+          echo "value=${default_token}" >> "$GITHUB_OUTPUT"
+        fi
+    - name: Configure authenticated git remote
+      shell: bash
+      run: |
+        git remote set-url origin "https://x-access-token:${{ steps.token.outputs.value }}@github.com/${{ github.repository }}.git"
     - name: Create Pull Request
       id: create_pr
       uses: peter-evans/create-pull-request@v8.1.0
       with:
-        token: ${{ inputs.git_token }}
-        branch-token: ${{ inputs.git_token }}
+        token: ${{ steps.token.outputs.value }}
+        branch-token: ${{ steps.token.outputs.value }}
         commit-message: |
           chore(deps): upgrade dependencies
         base: main
