@@ -7,7 +7,7 @@
 
 ```yaml
       - name: Upgrade Deps
-        uses: p6m7g8-actions/next-upgrade@main
+        uses: p6m7g8-actions/p6-next-upgrade@main
         with:
           gh_token: ${{ secrets.P6_PGOLLUCCI_GH_TOKEN }}
 ```
