@@ -11,8 +11,9 @@ inputs:
     default: ""
   hold_dependencies:
     description: >-
-      Space-separated packages whose package.json range must survive the
-      upgrade. See the Update Dependencies step for why typescript is held.
+      Packages whose package.json range must survive the upgrade, separated by
+      spaces, newlines, or both. See the Update Dependencies step for why
+      typescript is held.
     required: false
     default: "typescript"
 runs:
@@ -55,23 +56,43 @@ runs:
         pnpm up --latest --prod
 
         if [ -n "${HOLD//[[:space:]]/}" ]; then
-          read -ra hold <<< "$HOLD"
+          # `read` consumes ONE line, so a `hold_dependencies: |` block -- the
+          # dominant Actions idiom, one package per line -- would silently hold
+          # only the first entry and upgrade the rest. Flatten newlines to
+          # spaces first so both spellings behave the same. The emptiness guard
+          # above already covers newline-only input.
+          read -ra hold <<< "${HOLD//$'\n'/ }"
+          held=0
           for pkg in "${hold[@]}"; do
+            # `--prod` above scopes the upgrade to `dependencies` AND
+            # `optionalDependencies`, so omitting the latter here reported
+            # "nothing to hold" while the package was in fact being upgraded.
             range="$(jq -r --arg p "$pkg" \
-              '.dependencies[$p] // .devDependencies[$p] // empty' "$before")"
+              '.dependencies[$p] // .devDependencies[$p]
+               // .optionalDependencies[$p] // empty' "$before")"
             if [ -z "$range" ]; then
               echo "::notice::${pkg} not declared; nothing to hold"
               continue
             fi
             patched="$(mktemp)"
+            # Each branch names the section the range was found in. A bare
+            # `else .devDependencies[$p] = $r` would CREATE a devDependencies
+            # entry for an optionalDependencies-only package, moving it between
+            # sections behind your back.
             jq --arg p "$pkg" --arg r "$range" \
               'if .dependencies[$p] then .dependencies[$p] = $r
-               else .devDependencies[$p] = $r end' \
+               elif .devDependencies[$p] then .devDependencies[$p] = $r
+               else .optionalDependencies[$p] = $r end' \
               package.json > "$patched"
             mv "$patched" package.json
+            held=$((held + 1))
             echo "::notice::held ${pkg} at ${range}"
           done
-          pnpm install --no-frozen-lockfile
+          # Only re-resolve when a range actually changed. If every requested
+          # package was undeclared, the lockfile pnpm just wrote is correct.
+          if [ "$held" -gt 0 ]; then
+            pnpm install --no-frozen-lockfile
+          fi
         fi
     - name: Generate Delta
       shell: bash
